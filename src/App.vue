@@ -1,18 +1,46 @@
 <template>
   <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
+  <div v-for="item in items" :key="item">
+    <Child v-bind:message="item.message" v-bind:name="item.name"></Child>
+  </div>
 </template>
 
 <script lang="ts">
-import { Options, Vue } from 'vue-class-component';
-import HelloWorld from './components/HelloWorld.vue';
-
+import {Options, Vue} from 'vue-class-component';
+import Child from "@/Child.vue";
 @Options({
   components: {
-    HelloWorld,
+    Child
   },
+  data() {
+    return {
+      items: [],
+    }
+  },
+  methods:
+      {
+        load: function () {
+          console.log("load start")
+          fetch('./data.json')
+              .then(response => {
+                return response.json();
+              })
+              .then(json => {
+                this.items = json.data;
+                setTimeout(() =>
+                {
+                  console.log("reload start")
+                  this.load();
+                } , 1000)
+              })
+        }
+      },
+  mounted() {
+    this.load();
+  }
 })
-export default class App extends Vue {}
+export default class App extends Vue {
+}
 </script>
 
 <style>
